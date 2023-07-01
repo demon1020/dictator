@@ -1,13 +1,17 @@
 import 'package:dictator/output/output_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import 'app_config/realm_config.dart';
 import 'app_config/theme.dart';
 import 'home/home_screen.dart';
 import 'home/home_screen_provider.dart';
 
-void main() => runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  RealmConfig.createRealm();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -25,5 +29,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

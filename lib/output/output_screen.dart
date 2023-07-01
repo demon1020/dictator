@@ -83,6 +83,17 @@ class _OutputScreenState extends State<OutputScreen> {
         actions: [
           IconButton(
             onPressed: () async {
+              Map<String, String> data = {};
+              data["name"] = "New";
+              data["data"] = widget.extractText;
+              Navigator.pop(context, data);
+            },
+            icon: Icon(
+              Icons.save,
+            ),
+          ),
+          IconButton(
+            onPressed: () async {
               await Clipboard.setData(ClipboardData(text: provider.data));
             },
             icon: Icon(

@@ -1,9 +1,14 @@
+import 'dart:io';
+
+import 'package:dictator/widgets/image_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
 
 import '../app_config/theme.dart';
+import '../model/document_model.dart';
 import '../output/output_screen.dart';
+import '../services/file_manager.dart';
 import 'home_screen_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,7 +29,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   init() async {
-    supportedLocales = await flutterTts.getLanguages;
+    supportedLocales = [];
+    List<dynamic> tempLocales = [];
+
+    tempLocales = await flutterTts.getLanguages;
+    for (var datum in tempLocales) {
+      bool isInstalled = await flutterTts.isLanguageInstalled(datum);
+      if (isInstalled) {
+        supportedLocales.add(datum);
+      }
+    }
+    print("All Locale : ${tempLocales.length}");
+    print("Installed Locale : ${supportedLocales.length}");
   }
 
   @override
@@ -34,7 +50,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dictator'),
+        title: GestureDetector(
+            onTap: () {
+              provider.addDocument(
+                  Document(DateTime.now().microsecondsSinceEpoch, "Babu"));
+            },
+            child: Text('Dictator')),
         centerTitle: true,
         // elevation: 0,
       ),
@@ -48,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             //   height: size.height * 0.1,
             //   color: AppTheme.primary,
             // ),
+
             Container(
               width: size.width,
               decoration: BoxDecoration(
@@ -55,20 +77,60 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: ListView.separated(
                 shrinkWrap: true,
-                itemCount: docs.length,
+                itemCount: provider.fetchDocuments().length,
                 separatorBuilder: (context, index) {
                   return Container(
                       margin: EdgeInsets.symmetric(horizontal: 10),
                       child: Divider());
                 },
                 itemBuilder: (context, index) {
-                  var item = docs[index];
+                  var item = provider.fetchDocuments()[index];
                   return ListTile(
-                    leading: Icon(Icons.image),
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OutputScreen(
+                            extractText: item.data!,
+                            supportedLocales: supportedLocales,
+                          ),
+                        ),
+                      );
+                    },
+                    leading: item.path == null
+                        ? Icon(Icons.image)
+                        : !File(item.path!).existsSync()
+                        ? Icon(Icons.image)
+                        : GestureDetector(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ImageView(imagePath: item.path!),
+                          ),
+                        );
+                      },
+                      child: Hero(
+                        tag: "imageHero",
+                        child: SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: Image.file(
+                            File(item.path!),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
                     title: Text(
                       item.name,
                     ),
                     subtitle: Text(DateTime.now().toString()),
+                    trailing: IconButton(
+                        onPressed: () {
+                          provider.deleteDocument(item);
+                        },
+                        icon: Icon(Icons.delete)),
                   );
                 },
               ),
@@ -116,7 +178,6 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext context) {
         var provider = Provider.of<HomeScreenProvider>(context);
-
         return Visibility(
           visible: !provider.scanning,
           replacement: LoadingScreen(),
@@ -181,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     await provider.processData();
 
                     if (provider.extractText.isNotEmpty) {
-                      await Navigator.push(
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => OutputScreen(
@@ -190,6 +251,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       );
+                      if (result != null) {
+                        String path = await FileManager.createDirectory("images");
+                        String fileName = await FileManager.generateRandomFileName();
+                        String fullPath = path + Platform.pathSeparator + fileName;
+                        FileManager.moveFile(provider.pickedImage!, fullPath);
+
+                        provider.addDocument(
+                          Document(
+                            DateTime.now().microsecondsSinceEpoch,
+                            result["name"],
+                            data: result["data"],
+                            path: fullPath,
+                          ),
+                        );
+                      }
                       Navigator.pop(context);
                     }
                   },
@@ -222,34 +298,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-}
-
-List<Document> docs = [
-  Document(id: 1, name: "babu"),
-  Document(id: 2, name: "babu"),
-  Document(id: 3, name: "babu"),
-  Document(id: 4, name: "babu"),
-  Document(id: 5, name: "babu"),
-  Document(id: 6, name: "babu"),
-];
-
-class Document {
-  late int id;
-  late String name;
-  String? path;
-  String? data;
-  String? status;
-  DateTime? timestamp;
-  bool isSelected;
-
-  Document(
-      {required this.id,
-      required this.name,
-      this.path,
-      this.data,
-      this.status,
-      this.timestamp,
-      this.isSelected = false});
 }
 
 class LoadingScreen extends StatelessWidget {
