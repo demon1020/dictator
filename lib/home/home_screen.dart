@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:dictator/widgets/image_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:realm/realm.dart';
 
 import '../app_config/theme.dart';
 import '../model/document_model.dart';
@@ -50,12 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-            onTap: () {
-              provider.addDocument(
-                  Document(DateTime.now().microsecondsSinceEpoch, "Babu"));
-            },
-            child: Text('Dictator')),
+        title: GestureDetector(onTap: () {}, child: Text('DICTATOR')),
         centerTitle: true,
         // elevation: 0,
       ),
@@ -86,51 +83,62 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   var item = provider.fetchDocuments()[index];
                   return ListTile(
-                    onTap: (){
-                      Navigator.push(
+                    onTap: () async {
+                      Document document = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => OutputScreen(
-                            extractText: item.data!,
                             supportedLocales: supportedLocales,
+                            document: item,
+                            isEdit: true,
                           ),
                         ),
                       );
+                      if (document != null && document.isSaved == true) {
+                        provider.addDocument(document, update: true);
+                      }
                     },
                     leading: item.path == null
                         ? Icon(Icons.image)
                         : !File(item.path!).existsSync()
-                        ? Icon(Icons.image)
-                        : GestureDetector(
-                      onTap: (){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ImageView(imagePath: item.path!),
-                          ),
-                        );
-                      },
-                      child: Hero(
-                        tag: "imageHero",
-                        child: SizedBox(
-                          height: 40,
-                          width: 40,
-                          child: Image.file(
-                            File(item.path!),
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ),
+                            ? Icon(Icons.image)
+                            : GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          ImageView(imagePath: item.path!),
+                                    ),
+                                  );
+                                },
+                                child: Hero(
+                                  tag: item.path.toString(),
+                                  child: SizedBox(
+                                    height: 40,
+                                    width: 40,
+                                    child: Image.file(
+                                      File(item.path!),
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
                     title: Text(
                       item.name,
                     ),
-                    subtitle: Text(DateTime.now().toString()),
+                    subtitle: Text(
+                      "${DateFormat.MMMMEEEEd().format(item.timestamp!)} ${DateFormat.jm().format(item.timestamp!)}",
+                    ),
                     trailing: IconButton(
-                        onPressed: () {
-                          provider.deleteDocument(item);
-                        },
-                        icon: Icon(Icons.delete)),
+                      onPressed: () {
+                        provider.deleteDocument(item);
+                      },
+                      icon: Icon(
+                        Icons.delete_forever,
+                        color: Colors.redAccent,
+                      ),
+                    ),
                   );
                 },
               ),
@@ -203,15 +211,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     await provider.processData(fromCamera: true);
 
                     if (provider.extractText.isNotEmpty) {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OutputScreen(
-                            extractText: provider.extractText,
-                            supportedLocales: supportedLocales,
-                          ),
-                        ),
-                      );
+                      // await Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => OutputScreen(
+                      //       supportedLocales: supportedLocales,
+                      //       document: null,
+                      //     ),
+                      //   ),
+                      // );
                       Navigator.pop(context);
                     }
                   },
@@ -242,30 +250,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     await provider.processData();
 
                     if (provider.extractText.isNotEmpty) {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OutputScreen(
-                            extractText: provider.extractText,
-                            supportedLocales: supportedLocales,
-                          ),
-                        ),
-                      );
-                      if (result != null) {
-                        String path = await FileManager.createDirectory("images");
-                        String fileName = await FileManager.generateRandomFileName();
-                        String fullPath = path + Platform.pathSeparator + fileName;
-                        FileManager.moveFile(provider.pickedImage!, fullPath);
-
-                        provider.addDocument(
-                          Document(
-                            DateTime.now().microsecondsSinceEpoch,
-                            result["name"],
-                            data: result["data"],
-                            path: fullPath,
+                      try {
+                        Document document = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OutputScreen(
+                              supportedLocales: supportedLocales,
+                              document: Document(
+                                Uuid.v4(),
+                                "filename",
+                                data: provider.extractText,
+                              ),
+                            ),
                           ),
                         );
-                      }
+                        if (document != null && document.isSaved == true) {
+                          String path =
+                              await FileManager.createDirectory("images");
+                          String fileName =
+                              await FileManager.generateRandomFileName();
+                          String fullPath =
+                              path + Platform.pathSeparator + fileName;
+                          FileManager.moveFile(provider.pickedImage!, fullPath);
+
+                          document.path = fullPath;
+                          provider.addDocument(document);
+                        }
+                      } catch (e) {}
+
                       Navigator.pop(context);
                     }
                   },

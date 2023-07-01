@@ -1,4 +1,5 @@
 import 'package:dictator/app_config/theme.dart';
+import 'package:dictator/model/document_model.dart';
 import 'package:dictator/output/output_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,11 +8,16 @@ import 'package:provider/provider.dart';
 import '../widgets/app_slider.dart';
 
 class OutputScreen extends StatefulWidget {
-  final String extractText;
+  Document document;
   final List<dynamic> supportedLocales;
+  final bool isEdit;
 
-  const OutputScreen({super.key, required this.extractText, required this.supportedLocales});
-
+  OutputScreen({
+    super.key,
+    required this.supportedLocales,
+    required this.document,
+    this.isEdit = false,
+  });
 
   @override
   State<OutputScreen> createState() => _OutputScreenState();
@@ -24,15 +30,17 @@ class _OutputScreenState extends State<OutputScreen> {
   void initState() {
     super.initState();
     var provider = Provider.of<TextProvider>(context, listen: false);
+    provider.nameController.text = widget.document.name;
+
     provider.supportedLocales = widget.supportedLocales;
     provider.initializeTts();
-    provider.data = widget.extractText;
+    provider.data = widget.document.data!;
   }
 
   @override
   void dispose() {
-    var provider = Provider.of<TextProvider>(context, listen: false);
-    provider.flutterTts.stop();
+    // var provider = Provider.of<TextProvider>(context, listen: false);
+    // provider.flutterTts.stop();
     super.dispose();
   }
 
@@ -43,6 +51,51 @@ class _OutputScreenState extends State<OutputScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
+      appBar: AppBar(
+        title: TextFormField(
+          minLines: 1,
+          maxLines: widget.document.data!.length,
+          controller: provider.nameController,
+          textAlign: TextAlign.left,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.white,
+            decoration: TextDecoration.none,
+          ),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              widget.document.timestamp = DateTime.now();
+              widget.document.isSaved = true;
+              widget.document.name = provider.nameController.text;
+              Navigator.pop(context, widget.document);
+            },
+            icon: Icon(
+              Icons.save,
+            ),
+          ),
+          // IconButton(
+          //   onPressed: () async {
+          //     await Clipboard.setData(ClipboardData(text: provider.data));
+          //   },
+          //   icon: Icon(
+          //     Icons.copy,
+          //   ),
+          // ),
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              _scaffoldKey.currentState
+                  ?.openEndDrawer(); // Open the drawer on button press
+            },
+          ),
+        ],
+      ),
       endDrawer: Drawer(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -77,37 +130,6 @@ class _OutputScreenState extends State<OutputScreen> {
             ],
           ),
         ),
-      ),
-      appBar: AppBar(
-        title: Text('Output Text'),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              Map<String, String> data = {};
-              data["name"] = "New";
-              data["data"] = widget.extractText;
-              Navigator.pop(context, data);
-            },
-            icon: Icon(
-              Icons.save,
-            ),
-          ),
-          IconButton(
-            onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: provider.data));
-            },
-            icon: Icon(
-              Icons.copy,
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              _scaffoldKey.currentState
-                  ?.openEndDrawer(); // Open the drawer on button press
-            },
-          ),
-        ],
       ),
       body: ListView(
         children: [
@@ -181,9 +203,9 @@ class _OutputScreenState extends State<OutputScreen> {
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
             child: TextField(
               minLines: 1,
-              maxLines: widget.extractText.length,
+              maxLines: widget.document.data!.length,
               enabled: provider.isEditEnabled,
-              controller: TextEditingController(text: widget.extractText),
+              controller: TextEditingController(text: widget.document.data),
               textAlign: TextAlign.left,
               style: TextStyle(
                 fontSize: 15,

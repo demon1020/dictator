@@ -20,8 +20,8 @@ class HomeScreenProvider extends ChangeNotifier {
     return DocumentRepository().fetchDocumentsData();
   }
 
-  void addDocument(Document document) {
-    DocumentRepository().addDocument(document);
+  void addDocument(Document document,{bool update = false}) {
+    DocumentRepository().addDocument(document,update:update);
     notifyListeners();
   }
 

@@ -9,9 +9,9 @@ class DocumentRepository{
     return RealmConfig.documentRealm.all<Document>();
   }
 
-  void addDocument(Document document) {
+  void addDocument(Document document, {bool update = false}) {
     RealmConfig.documentRealm.write((){
-      RealmConfig.documentRealm.add(document);
+      RealmConfig.documentRealm.add(document,update: update);
     });
   }
 

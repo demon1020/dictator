@@ -42,7 +42,7 @@ dependencies:
   get: ^4.6.5
   realm: ^1.2.0
   path_provider:
-  uuid:
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

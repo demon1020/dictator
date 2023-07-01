@@ -11,17 +11,19 @@ class Document extends _Document
   static var _defaultsSet = false;
 
   Document(
-    int id,
+    Uuid id,
     String name, {
     String? path,
     String? data,
     String? status,
     DateTime? timestamp,
     bool isSelected = false,
+    bool isSaved = false,
   }) {
     if (!_defaultsSet) {
       _defaultsSet = RealmObjectBase.setDefaults<Document>({
         'isSelected': false,
+        'isSaved': false,
       });
     }
     RealmObjectBase.set(this, 'id', id);
@@ -31,14 +33,15 @@ class Document extends _Document
     RealmObjectBase.set(this, 'status', status);
     RealmObjectBase.set(this, 'timestamp', timestamp);
     RealmObjectBase.set(this, 'isSelected', isSelected);
+    RealmObjectBase.set(this, 'isSaved', isSaved);
   }
 
   Document._();
 
   @override
-  int get id => RealmObjectBase.get<int>(this, 'id') as int;
+  Uuid get id => RealmObjectBase.get<Uuid>(this, 'id') as Uuid;
   @override
-  set id(int value) => RealmObjectBase.set(this, 'id', value);
+  set id(Uuid value) => RealmObjectBase.set(this, 'id', value);
 
   @override
   String get name => RealmObjectBase.get<String>(this, 'name') as String;
@@ -73,6 +76,11 @@ class Document extends _Document
   set isSelected(bool value) => RealmObjectBase.set(this, 'isSelected', value);
 
   @override
+  bool get isSaved => RealmObjectBase.get<bool>(this, 'isSaved') as bool;
+  @override
+  set isSaved(bool value) => RealmObjectBase.set(this, 'isSaved', value);
+
+  @override
   Stream<RealmObjectChanges<Document>> get changes =>
       RealmObjectBase.getChanges<Document>(this);
 
@@ -84,13 +92,14 @@ class Document extends _Document
   static SchemaObject _initSchema() {
     RealmObjectBase.registerFactory(Document._);
     return const SchemaObject(ObjectType.realmObject, Document, 'Document', [
-      SchemaProperty('id', RealmPropertyType.int),
+      SchemaProperty('id', RealmPropertyType.uuid),
       SchemaProperty('name', RealmPropertyType.string),
       SchemaProperty('path', RealmPropertyType.string, optional: true),
       SchemaProperty('data', RealmPropertyType.string, optional: true),
       SchemaProperty('status', RealmPropertyType.string, optional: true),
       SchemaProperty('timestamp', RealmPropertyType.timestamp, optional: true),
       SchemaProperty('isSelected', RealmPropertyType.bool),
+      SchemaProperty('isSaved', RealmPropertyType.bool),
     ]);
   }
 }

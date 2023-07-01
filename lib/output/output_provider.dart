@@ -13,6 +13,7 @@ class TextProvider with ChangeNotifier {
   double speechRate = 0.5;
   dynamic selectedLocale = "en-US";
   List<dynamic> supportedLocales = [];
+  TextEditingController nameController = TextEditingController();
 
   updatePitch(newValue){
     pitch = newValue;
