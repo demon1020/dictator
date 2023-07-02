@@ -2,7 +2,7 @@
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:realm/realm.dart';
+import 'package:uuid/uuid.dart';
 
 enum FileExtention {jpg, png}
 class FileManager {
@@ -129,7 +129,7 @@ class FileManager {
   }
 
   static generateRandomFileName({FileExtention extention = FileExtention.jpg}) async{
-    String fileName = "${Uuid.v4()}.${extention.name}";
+    String fileName = "${Uuid().v4()}.${extention.name}";
     return fileName;
   }
 }

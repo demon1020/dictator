@@ -1,17 +1,19 @@
 import 'dart:io';
 
+import 'package:dictator/feature/settings/settings_screen.dart';
 import 'package:dictator/widgets/image_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:realm/realm.dart';
+// import 'package:realm/realm.dart';
 
-import '../app_config/theme.dart';
-import '../model/document_model.dart';
+import '../../app_config/theme.dart';
+import '../../model/document_model.dart';
+import '../../services/file_manager.dart';
 import '../output/output_screen.dart';
-import '../services/file_manager.dart';
 import 'home_screen_provider.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -54,7 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: GestureDetector(onTap: () {}, child: Text('DICTATOR')),
         centerTitle: true,
-        // elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Get.to(() => SettingsScreen());
+            },
+          ),
+        ],
       ),
       body: Container(
         height: size.height,
@@ -74,14 +83,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: ListView.separated(
                 shrinkWrap: true,
-                itemCount: provider.fetchDocuments().length,
+                itemCount: provider.documentList.length,
                 separatorBuilder: (context, index) {
                   return Container(
                       margin: EdgeInsets.symmetric(horizontal: 10),
                       child: Divider());
                 },
                 itemBuilder: (context, index) {
-                  var item = provider.fetchDocuments()[index];
+                  var item = provider.documentList[index];
                   return ListTile(
                     onTap: () async {
                       Document document = await Navigator.push(
@@ -95,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                       if (document != null && document.isSaved == true) {
-                        provider.addDocument(document, update: true);
+                        // provider.addDocument(document, update: true);
                       }
                     },
                     leading: item.path == null
@@ -132,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        provider.deleteDocument(item);
+                        // provider.deleteDocument(item);
                       },
                       icon: Icon(
                         Icons.delete_forever,
@@ -256,11 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           MaterialPageRoute(
                             builder: (context) => OutputScreen(
                               supportedLocales: supportedLocales,
-                              document: Document(
-                                Uuid.v4(),
-                                "filename",
-                                data: provider.extractText,
-                              ),
+                              document: Document(),
                             ),
                           ),
                         );
@@ -274,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           FileManager.moveFile(provider.pickedImage!, fullPath);
 
                           document.path = fullPath;
-                          provider.addDocument(document);
+                          // provider.addDocument(document);
                         }
                       } catch (e) {}
 

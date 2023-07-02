@@ -5,34 +5,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_tesseract_ocr/android_ios.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:realm/realm.dart';
+// import 'package:realm/realm.dart';
 
-import '../model/document_model.dart';
-import '../repository/document_repository.dart';
+import '../../model/document_model.dart';
+import '../../repository/document_repository.dart';
 
 class HomeScreenProvider extends ChangeNotifier {
   bool scanning = false;
   String extractText = '';
   File? pickedImage;
-  // RealmResults<Document> documentList;
+  List<Document> documentList = [];
 
-  RealmResults<Document> fetchDocuments(){
-    return DocumentRepository().fetchDocumentsData();
-  }
-
-  void addDocument(Document document,{bool update = false}) {
-    DocumentRepository().addDocument(document,update:update);
-    notifyListeners();
-  }
-
-  void deleteDocument(Document document) {
-    DocumentRepository().deleteDocument(document);
-    notifyListeners();
-  }
-
-  void deleteAllDocument() {
-    DocumentRepository().deleteAllDocument();
-    notifyListeners();
+  fetchDocuments() async{
+    documentList = await DocumentRepository().fetchDocumentsData();
   }
 
   void updateScanningStatus() {

@@ -1,24 +1,25 @@
+
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-part 'document_model.g.dart';
+part 'trained_language_model.g.dart';
 
-@HiveType(typeId: 0)
-class Document {
+@HiveType(typeId: 1)
+class TrainedLanguage {
   @HiveField(0)
   late Uuid id;
   @HiveField(1)
   late String name;
   @HiveField(2)
-  String? path;
+  late int progress;
   @HiveField(3)
-  String? data;
+  String? languageCode;
   @HiveField(4)
-  String? status;
+  String? trainedLanguage;
   @HiveField(5)
   DateTime? timestamp;
   @HiveField(6)
-  bool isSelected = false;
+  bool isDownloaded = false;
   @HiveField(7)
-  bool isSaved = false;
+  bool isInitialised = false;
 }

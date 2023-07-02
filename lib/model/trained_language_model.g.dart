@@ -1,34 +1,34 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'document_model.dart';
+part of 'trained_language_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DocumentAdapter extends TypeAdapter<Document> {
+class TrainedLanguageAdapter extends TypeAdapter<TrainedLanguage> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
-  Document read(BinaryReader reader) {
+  TrainedLanguage read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Document()
+    return TrainedLanguage()
       ..id = fields[0] as Uuid
       ..name = fields[1] as String
-      ..path = fields[2] as String?
-      ..data = fields[3] as String?
-      ..status = fields[4] as String?
+      ..progress = fields[2] as int
+      ..languageCode = fields[3] as String?
+      ..trainedLanguage = fields[4] as String?
       ..timestamp = fields[5] as DateTime?
-      ..isSelected = fields[6] as bool
-      ..isSaved = fields[7] as bool;
+      ..isDownloaded = fields[6] as bool
+      ..isInitialised = fields[7] as bool;
   }
 
   @override
-  void write(BinaryWriter writer, Document obj) {
+  void write(BinaryWriter writer, TrainedLanguage obj) {
     writer
       ..writeByte(8)
       ..writeByte(0)
@@ -36,17 +36,17 @@ class DocumentAdapter extends TypeAdapter<Document> {
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.path)
+      ..write(obj.progress)
       ..writeByte(3)
-      ..write(obj.data)
+      ..write(obj.languageCode)
       ..writeByte(4)
-      ..write(obj.status)
+      ..write(obj.trainedLanguage)
       ..writeByte(5)
       ..write(obj.timestamp)
       ..writeByte(6)
-      ..write(obj.isSelected)
+      ..write(obj.isDownloaded)
       ..writeByte(7)
-      ..write(obj.isSaved);
+      ..write(obj.isInitialised);
   }
 
   @override
@@ -55,7 +55,7 @@ class DocumentAdapter extends TypeAdapter<Document> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DocumentAdapter &&
+      other is TrainedLanguageAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
