@@ -1,11 +1,6 @@
 import 'dart:io';
 
-import 'package:dictator/model/trained_language_model.dart';
-import 'package:dictator/repository/data.dart';
-import 'package:dictator/repository/trained_language_repository.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_tesseract_ocr/flutter_tesseract_ocr.dart';
-// import 'package:realm/realm.dart';
+import 'package:dictator/core.dart';
 
 class SettingsProvider extends ChangeNotifier {
   bool isExpanded = false;
@@ -20,24 +15,42 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  init() {
+  init() async {
     if (trainedLanguages.isEmpty) {
       print("empty");
       languageTrainedDataMap.entries.toList().forEach((element) {
-        // TrainedLanguage language = TrainedLanguage(Uuid.v4(), element.key, 0,
-        //     trainedLanguage: element.value, isInitialised: true);
-        // addToRealmDb(language);
+        TrainedLanguage language = TrainedLanguage();
+        language.id = Uuid().v4();
+        language.name = element.key;
+        language.trainedLanguage = element.value;
+        trainedLanguages.add(language);
       });
+      await TrainedLanguageRepository().addAllToRepository(trainedLanguages);
       fetchTrainedLanguages();
     }
   }
 
   fetchTrainedLanguages() async{
-    trainedLanguages = await TrainedLanguageRepository().fetchTrainedLanguages();
+    trainedLanguages = await TrainedLanguageRepository().fetchDataFromRepository();
   }
 
+  updateRepository(TrainedLanguage language) async{
+    await TrainedLanguageRepository().updateRepository(language);
+  }
+
+  deleteLanguageData(TrainedLanguage trainedLanguage) async{
+    if(File(trainedLanguage.path!).existsSync()){
+      File(trainedLanguage.path!).deleteSync();
+      trainedLanguage.path = null;
+      trainedLanguage.isDownloaded = false;
+      trainedLanguage.isDownloading = false;
+      await TrainedLanguageRepository().updateRepository(trainedLanguage);
+    }
+    notifyListeners();
+  }
 
   downloadLanguage(TrainedLanguage item) async {
+    item.isDownloading = true;
     if (kIsWeb == false) {
       Directory dir = Directory(await FlutterTesseractOcr.getTessdataPath());
       if (!dir.existsSync()) {
@@ -62,8 +75,11 @@ class SettingsProvider extends ChangeNotifier {
         await file.writeAsBytes(bytes);
         bDownloadtessFile = false;
         print(isInstalled);
-        // item.isDownloaded = true;
-        // addToRealmDb(item, update: true);
+        item.isDownloaded = true;
+        item.isDownloading = false;
+        item.path = file.path;
+        await updateRepository(item);
+        notifyListeners();
       }
     }
   }

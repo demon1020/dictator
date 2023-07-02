@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:dictator/core.dart';
 
 class AppTheme {
   static const Color primary = Color(0xFF1CC1E4);

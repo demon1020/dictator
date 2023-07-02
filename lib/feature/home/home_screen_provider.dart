@@ -1,14 +1,6 @@
-import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_tesseract_ocr/android_ios.dart';
-import 'package:image_picker/image_picker.dart';
-// import 'package:realm/realm.dart';
-
-import '../../model/document_model.dart';
-import '../../repository/document_repository.dart';
+import 'package:dictator/core.dart';
 
 class HomeScreenProvider extends ChangeNotifier {
   bool scanning = false;

@@ -1,19 +1,7 @@
 import 'dart:io';
 
-import 'package:dictator/feature/settings/settings_screen.dart';
-import 'package:dictator/widgets/image_view.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:dictator/core.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-// import 'package:realm/realm.dart';
-
-import '../../app_config/theme.dart';
-import '../../model/document_model.dart';
-import '../../services/file_manager.dart';
-import '../output/output_screen.dart';
-import 'home_screen_provider.dart';
-import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

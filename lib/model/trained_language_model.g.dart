@@ -17,14 +17,14 @@ class TrainedLanguageAdapter extends TypeAdapter<TrainedLanguage> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return TrainedLanguage()
-      ..id = fields[0] as Uuid
+      ..id = fields[0] as String
       ..name = fields[1] as String
-      ..progress = fields[2] as int
-      ..languageCode = fields[3] as String?
-      ..trainedLanguage = fields[4] as String?
-      ..timestamp = fields[5] as DateTime?
-      ..isDownloaded = fields[6] as bool
-      ..isInitialised = fields[7] as bool;
+      ..languageCode = fields[2] as String?
+      ..trainedLanguage = fields[3] as String?
+      ..timestamp = fields[4] as DateTime?
+      ..isDownloaded = fields[5] as bool
+      ..isDownloading = fields[6] as bool
+      ..path = fields[7] as String?;
   }
 
   @override
@@ -36,17 +36,17 @@ class TrainedLanguageAdapter extends TypeAdapter<TrainedLanguage> {
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.progress)
-      ..writeByte(3)
       ..write(obj.languageCode)
-      ..writeByte(4)
+      ..writeByte(3)
       ..write(obj.trainedLanguage)
-      ..writeByte(5)
+      ..writeByte(4)
       ..write(obj.timestamp)
-      ..writeByte(6)
+      ..writeByte(5)
       ..write(obj.isDownloaded)
+      ..writeByte(6)
+      ..write(obj.isDownloading)
       ..writeByte(7)
-      ..write(obj.isInitialised);
+      ..write(obj.path);
   }
 
   @override

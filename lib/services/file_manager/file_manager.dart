@@ -1,8 +1,6 @@
-
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:dictator/core.dart';
 
 enum FileExtention {jpg, png}
 class FileManager {

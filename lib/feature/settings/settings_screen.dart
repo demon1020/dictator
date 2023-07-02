@@ -1,8 +1,4 @@
-import 'package:dictator/app_config/theme.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'settings_provider.dart';
+import 'package:dictator/core.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -50,24 +46,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             visible: provider.isExpanded,
             child: SizedBox(
               height: size.height,
-              child: ListView.separated(
+              child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: provider.trainedLanguages.length,
-                separatorBuilder: (context, index) {
-                  return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      child: Divider(color: Colors.grey,));
-                },
                 itemBuilder: (context, index) {
                   var item = provider.trainedLanguages[index];
                   return ListTile(
                     title: Text(item.name),
-                    subtitle: provider.bDownloadtessFile
+                    subtitle: item.isDownloading
                         ? LinearProgressIndicator()
-                        : SizedBox.shrink(),
+                        : (!item.isDownloading && item.isDownloaded)
+                            ? Text('Downloaded',style: TextStyle(color: Colors.green),)
+                            : SizedBox.shrink(),
                     trailing: IconButton(
                       onPressed: () {
-                        // provider.downloadLanguage(item,index);
+                        if(!item.isDownloaded){
+                          provider.downloadLanguage(item);
+                        }else{
+                          provider.deleteLanguageData(item);
+                        }
                         setState(() {});
                       },
                       icon: Icon(item.isDownloaded

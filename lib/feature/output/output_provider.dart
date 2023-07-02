@@ -1,7 +1,4 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:dictator/core.dart';
 
 class TextProvider with ChangeNotifier {
   late FlutterTts flutterTts;

@@ -1,5 +1,4 @@
-import 'package:hive/hive.dart';
-import 'package:uuid/uuid.dart';
+import 'package:dictator/core.dart';
 
 part 'document_model.g.dart';
 

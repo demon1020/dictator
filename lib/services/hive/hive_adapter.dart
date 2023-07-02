@@ -1,6 +1,4 @@
-import 'package:dictator/model/document_model.dart';
-import 'package:dictator/model/trained_language_model.dart';
-import 'package:hive/hive.dart';
+import 'package:dictator/core.dart';
 
 class RegisterHiveAdapters {
   static void registerHiveAdapters() {

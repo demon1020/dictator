@@ -1,5 +1,4 @@
-import 'package:dictator/helper/i_db_helper.dart';
-import 'package:dictator/model/document_model.dart';
+import 'package:dictator/core.dart';
 
 class DocumentRepository extends IDBHelper{
 
