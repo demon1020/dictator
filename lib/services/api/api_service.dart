@@ -29,16 +29,14 @@ class ApiService extends GetConnect {
     }
   }
 
-  Future<void> downloadFile(String endpoint, String filePath) async {
+  Future<Uint8List> downloadFile(String endpoint) async {
     try {
-      final response = await get('$endpoint');
-      if (response.status.hasError) {
-        throw Exception(response.statusText);
-      }
-      final bytes = response.bodyBytes;
-      final file = File(filePath);
-      await file.writeAsBytes(bytes as List<int>);
-      print('File saved successfully.');
+      HttpClient httpClient = HttpClient();
+      HttpClientRequest request = await httpClient
+          .getUrl(Uri.parse("$endpoint}"));
+      HttpClientResponse response = await request.close();
+      Uint8List bytes = await consolidateHttpClientResponseBytes(response);
+      return bytes;
     } catch (e) {
       throw Exception('Failed to download file: $e');
     }
