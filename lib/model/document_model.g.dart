@@ -16,15 +16,16 @@ class DocumentAdapter extends TypeAdapter<Document> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Document()
-      ..id = fields[0] as Uuid
-      ..name = fields[1] as String
-      ..path = fields[2] as String?
-      ..data = fields[3] as String?
-      ..status = fields[4] as String?
-      ..timestamp = fields[5] as DateTime?
-      ..isSelected = fields[6] as bool
-      ..isSaved = fields[7] as bool;
+    return Document(
+      id: fields[0] as String,
+      name: fields[1] as String,
+      path: fields[2] as String?,
+      data: fields[3] as String?,
+      status: fields[4] as String?,
+      timestamp: fields[5] as DateTime?,
+      isSelected: fields[6] as bool,
+      isSaved: fields[7] as bool,
+    );
   }
 
   @override

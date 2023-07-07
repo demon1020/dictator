@@ -55,19 +55,4 @@ abstract class IDBHelper {
     }
     box.deleteFromDisk();
   }
-
-  saveData<T>(List<T> dataArray, String boxName,{bool deleteBoxDataIfEmpty = false}) async {
-    if (dataArray != null && dataArray.isNotEmpty) {
-      Box box = await Hive.openBox<T>(boxName);
-      box.deleteAll(box.keys);
-      for (T obj in dataArray) {
-        box.add(obj);
-      }
-    }else{
-      if(deleteBoxDataIfEmpty){
-        Box box = await Hive.openBox<T>(boxName);
-        box.deleteAll(box.keys);
-      }
-    }
-  }
 }

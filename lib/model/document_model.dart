@@ -5,7 +5,7 @@ part 'document_model.g.dart';
 @HiveType(typeId: 0)
 class Document {
   @HiveField(0)
-  late Uuid id;
+  late String id;
   @HiveField(1)
   late String name;
   @HiveField(2)
@@ -20,4 +20,15 @@ class Document {
   bool isSelected = false;
   @HiveField(7)
   bool isSaved = false;
+
+  Document({
+    required this.id,
+    required this.name,
+    this.path,
+    this.data,
+    this.status,
+    this.timestamp,
+    this.isSelected = false,
+    this.isSaved = false,
+  });
 }

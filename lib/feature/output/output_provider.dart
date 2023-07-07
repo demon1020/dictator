@@ -4,13 +4,13 @@ class TextProvider with ChangeNotifier {
   late FlutterTts flutterTts;
   bool isReading = false;
   bool isEditEnabled = false;
-  String data = '';
   double pitch = 0.5;
   int showPitch = 50;
   double speechRate = 0.5;
   dynamic selectedLocale = "en-US";
   List<dynamic> supportedLocales = [];
   TextEditingController nameController = TextEditingController();
+  TextEditingController dataController = TextEditingController();
 
   updatePitch(newValue){
     pitch = newValue;
@@ -38,7 +38,7 @@ class TextProvider with ChangeNotifier {
   Future<void> startReadingProcess() async {
     isReading = true;
     notifyListeners();
-    await flutterTts.speak(data);
+    await flutterTts.speak(dataController.text);
     notifyListeners();
   }
 

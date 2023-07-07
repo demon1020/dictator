@@ -24,10 +24,9 @@ class _OutputScreenState extends State<OutputScreen> {
     super.initState();
     var provider = Provider.of<TextProvider>(context, listen: false);
     provider.nameController.text = widget.document.name;
-
     provider.supportedLocales = widget.supportedLocales;
+    provider.dataController.text = widget.document.data!;
     provider.initializeTts();
-    provider.data = widget.document.data!;
   }
 
   @override
@@ -47,7 +46,7 @@ class _OutputScreenState extends State<OutputScreen> {
       appBar: AppBar(
         title: TextFormField(
           minLines: 1,
-          maxLines: widget.document.data!.length,
+          maxLines: provider.dataController.text.length,
           controller: provider.nameController,
           textAlign: TextAlign.left,
           style: TextStyle(
@@ -66,6 +65,7 @@ class _OutputScreenState extends State<OutputScreen> {
               widget.document.timestamp = DateTime.now();
               widget.document.isSaved = true;
               widget.document.name = provider.nameController.text;
+              widget.document.data = provider.dataController.text;
               Navigator.pop(context, widget.document);
             },
             icon: Icon(
@@ -196,9 +196,9 @@ class _OutputScreenState extends State<OutputScreen> {
             margin: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
             child: TextField(
               minLines: 1,
-              maxLines: widget.document.data!.length,
-              enabled: provider.isEditEnabled,
-              controller: TextEditingController(text: widget.document.data),
+              maxLines: provider.dataController.text.length,
+              // enabled: provider.isEditEnabled,
+              controller: provider.dataController,
               textAlign: TextAlign.left,
               style: TextStyle(
                 fontSize: 15,

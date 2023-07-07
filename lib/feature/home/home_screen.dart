@@ -16,13 +16,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    var provider = Provider.of<HomeScreenProvider>(context, listen: false);
+
     init();
+
     super.initState();
   }
+
+  // initialiseTrainedLanguages() async{
+  //   final provider = Provider.of<SettingsProvider>(context, listen: false);
+  //   await provider.fetchTrainedLanguages();
+  //   await provider.init();
+  // }
 
   init() async {
     supportedLocales = [];
     List<dynamic> tempLocales = [];
+
+    var provider = Provider.of<HomeScreenProvider>(context, listen: false);
+    provider.fetchDocuments();
 
     tempLocales = await flutterTts.getLanguages;
     for (var datum in tempLocales) {
@@ -81,18 +93,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   var item = provider.documentList[index];
                   return ListTile(
                     onTap: () async {
-                      Document document = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OutputScreen(
-                            supportedLocales: supportedLocales,
-                            document: item,
-                            isEdit: true,
-                          ),
+                      Document document = await Get.to(
+                        () => OutputScreen(
+                          supportedLocales: supportedLocales,
+                          document: item,
+                          isEdit: true,
                         ),
                       );
                       if (document != null && document.isSaved == true) {
-                        // provider.addDocument(document, update: true);
+                        provider.updateRepository(document);
                       }
                     },
                     leading: item.path == null
@@ -129,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     trailing: IconButton(
                       onPressed: () {
-                        // provider.deleteDocument(item);
+                        provider.deleteFromRepository(item);
                       },
                       icon: Icon(
                         Icons.delete_forever,
@@ -248,12 +257,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     if (provider.extractText.isNotEmpty) {
                       try {
-                        Document document = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OutputScreen(
-                              supportedLocales: supportedLocales,
-                              document: Document(),
+                        Document document = await Get.to(
+                          () => OutputScreen(
+                            supportedLocales: supportedLocales,
+                            document: Document(
+                              id: Uuid().v4(),
+                              name: "filename",
+                              data: provider.extractText,
                             ),
                           ),
                         );
@@ -267,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           FileManager.moveFile(provider.pickedImage!, fullPath);
 
                           document.path = fullPath;
-                          // provider.addDocument(document);
+                          provider.addToRepository(document);
                         }
                       } catch (e) {}
 
